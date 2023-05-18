@@ -25,6 +25,12 @@ async function run() {
 
     const toysCollection = client.db('toyDB').collection('toys');
 
+    const indexKeys = { name: 1 };
+    const indexOptions = {
+      name: 'name'
+    };
+    const result = await toysCollection.createIndex(indexKeys, indexOptions);
+
     app.get('/allToys', async (req, res) => {
       const result = await toysCollection.find({}).toArray();
       res.send(result);
@@ -59,6 +65,15 @@ async function run() {
       const result = await toysCollection.findOne(query);
       res.send(result);
     })
+    app.get('/searchAllToys/:searchText', async (req, res) => {
+      const text = req.params.searchText;
+      const result = await toysCollection.find({
+        $or: [
+          { name: { $regex: text, $options: 'i' } }
+        ]
+      }).toArray();
+      res.send(result);
+    })
 
     app.post('/addToy', async (req, res) => {
       const toys = req.body;
@@ -88,7 +103,7 @@ async function run() {
       res.send(result);
     })
 
-    await client.db("admin").command({ ping: 1 });
+    client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // await client.close();
