@@ -44,6 +44,15 @@ async function run() {
         const result = await toysCollection.find(query).toArray();
         res.send(result);
     })
+    app.get('/myToys', async (req, res) => {
+        const email = req.query.email;
+        let query = {}
+        if(email) {
+            query = { email: email };
+        }
+        const result = await toysCollection.find(query).toArray();
+        res.send(result);
+    })
 
     app.post('/addToy', async (req, res) => {
         const toys = req.body;
