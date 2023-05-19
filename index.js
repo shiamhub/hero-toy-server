@@ -21,7 +21,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    client.connect();
+    // client.connect();
 
     const toysCollection = client.db('toyDB').collection('toys');
 
@@ -32,7 +32,7 @@ async function run() {
     const result = await toysCollection.createIndex(indexKeys, indexOptions);
 
     app.get('/allToys', async (req, res) => {
-      const result = await toysCollection.find({}).toArray();
+      const result = await toysCollection.find({}).limit(20).toArray();
       res.send(result);
     })
     app.get('/allToys/:id', async (req, res) => {
@@ -74,6 +74,10 @@ async function run() {
       }).toArray();
       res.send(result);
     })
+    app.get('/allToysSortByPrice', async (req, res) => {
+      const result = await toysCollection.find({}).sort({ price: 1 }).limit(20).toArray();
+      res.send(result);
+    })
 
     app.post('/addToy', async (req, res) => {
       const toys = req.body;
@@ -82,6 +86,7 @@ async function run() {
     })
     app.put('/updateMyToy/:id', async (req, res) => {
       const id = req.params.id;
+      console.log(id);
       const query = { _id: new ObjectId(id) };
       const options = { upsert: true };
       const updateToy = req.body;
@@ -103,7 +108,7 @@ async function run() {
       res.send(result);
     })
 
-    client.db("admin").command({ ping: 1 });
+    // client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // await client.close();
