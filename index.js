@@ -29,12 +29,29 @@ async function run() {
     const indexOptions = {
       name: 'name'
     };
-    const result = await toysCollection.createIndex(indexKeys, indexOptions);
+    // const result = await toysCollection.createIndex(indexKeys, indexOptions);
 
     app.get('/allToys', async (req, res) => {
       const result = await toysCollection.find({}).limit(20).toArray();
       res.send(result);
     })
+    app.get('/pageAllToys', async (req, res) => {
+      console.log(req.query);
+      const page = parseInt(req.query.page) || 0;
+      const limit = parseInt(req.query.limit) || 6;
+      const skip = page * limit;
+
+      const result = await toysCollection.find({}).skip(skip).limit(limit).toArray();
+      res.send(result);
+    })
+    app.get('/totalToys', async (req, res) => {
+      const result = await toysCollection.estimatedDocumentCount();
+      res.send({
+        totalToys: result
+      })
+    })
+
+
     app.get('/allToys/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -59,6 +76,8 @@ async function run() {
       const result = await toysCollection.find(query).toArray();
       res.send(result);
     })
+
+    
     app.get('/updateMyToy/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -74,8 +93,12 @@ async function run() {
       }).toArray();
       res.send(result);
     })
-    app.get('/allToysSortByPrice', async (req, res) => {
+    app.get('/allToysSortByAscending', async (req, res) => {
       const result = await toysCollection.find({}).sort({ price: 1 }).limit(20).toArray();
+      res.send(result);
+    })
+    app.get('/allToysSortByDescending', async (req, res) => {
+      const result = await toysCollection.find({}).sort({ price: -1 }).limit(20).toArray();
       res.send(result);
     })
 
