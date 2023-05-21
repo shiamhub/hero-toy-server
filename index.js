@@ -77,7 +77,27 @@ async function run() {
       res.send(result);
     })
 
-    
+    app.get('/myToysSortByAscending', async (req, res) => {
+      const email = req.query.email;
+      let query = {}
+      if (email) {
+        query = { email: email };
+      }
+      const result = await toysCollection.find(query).sort({ price: 1 }).toArray();
+      res.send(result);
+    })
+    app.get('/myToysSortByDescending', async (req, res) => {
+      const email = req.query.email;
+      let query = {}
+      if (email) {
+        query = { email: email };
+      }
+      const result = await toysCollection.find(query).sort({ price: -1 }).toArray();
+      res.send(result);
+    })
+
+
+
     app.get('/updateMyToy/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -91,14 +111,6 @@ async function run() {
           { name: { $regex: text, $options: 'i' } }
         ]
       }).toArray();
-      res.send(result);
-    })
-    app.get('/allToysSortByAscending', async (req, res) => {
-      const result = await toysCollection.find({}).sort({ price: 1 }).limit(20).toArray();
-      res.send(result);
-    })
-    app.get('/allToysSortByDescending', async (req, res) => {
-      const result = await toysCollection.find({}).sort({ price: -1 }).limit(20).toArray();
       res.send(result);
     })
 
